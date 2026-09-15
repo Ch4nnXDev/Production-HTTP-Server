@@ -3,28 +3,33 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/channakarawita/production-http-server/internal/middleware"
+	"github.com/channakarawita/production-http-server/internal/router"
 )
 
 func main() {
 
-	router := http.NewServeMux()
+	r := router.NewRouter()
 
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Method:", r.Method)
+	r.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		log.Println("Method:", req.Method)
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("GO HTTP SERVER"))
-	})
+	}), "GET")
 
-	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	r.Handle("/health", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status":"healthy"}`))
-	})
+	}), "GET")
+
+	handler := middleware.Logging(r)
 
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: handler,
 	}
 
 	log.Println("Server Listening On: 8080")
