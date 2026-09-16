@@ -25,7 +25,9 @@ func main() {
 		w.Write([]byte(`{"status":"healthy"}`))
 	}), "GET")
 
-	handler := middleware.Logging(r)
+	handler := middleware.RequestID(
+		middleware.Logging(r),
+	)
 
 	server := &http.Server{
 		Addr:    ":8080",
