@@ -35,8 +35,8 @@ func main() {
 	}), "GET")
 
 	handler := middleware.RequestID(
-		middleware.Recovery(
-			middleware.Logging(r),
+		middleware.Logging(
+			middleware.Recovery(r),
 		),
 		
 	)
@@ -56,7 +56,7 @@ func main() {
 
 	err := server.ListenAndServe()
 
-	if err != nil {
+	if err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 }

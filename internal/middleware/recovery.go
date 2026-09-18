@@ -13,17 +13,14 @@ func Recovery(next http.Handler) http.Handler {
 
 		defer func() {
 			if err := recover(); err != nil {
-				log.Println("Internal Error Happened", err, debug.Stack())
+				requestID := r.Context().Value(requestIDKey)
+				log.Println("Internal Error Happened", requestID ,err, debug.Stack())
 				http.Error(
 					w,
 					"Internal Server Error",
 					http.StatusInternalServerError,
 				)
-
 			}
-
-
-
 		} ()
 
 		next.ServeHTTP(w, r)
